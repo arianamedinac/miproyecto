@@ -61,7 +61,7 @@
     });
 
     escena.addEventListener('arReady', () => {
-      estado.textContent = 'Cámara lista. Enfoca tu pin.';
+      estado.textContent = 'Cámara lista. Enfoca tu Imagen.';
     });
     escena.addEventListener('arError', () => {
       estado.textContent = 'Error al iniciar la cámara. Revisa permisos o targets.mind.';
@@ -92,3 +92,8 @@
   </script>
 </body>
 </html>
+fetch('./targets.mind')
+  .then(r => { estado.textContent = 'targets.mind: ' + r.status + ' (' + r.headers.get('content-length') + ' bytes)'; })
+  .catch(() => { estado.textContent = 'No se pudo leer targets.mind'; });
+
+escena.addEventListener('loaded', () => console.log('escena cargada'));
