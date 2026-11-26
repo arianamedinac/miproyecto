@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Termo AG Láser</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <style>
+    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; font-family:sans-serif; }
+    #estado-ar {
+      position:fixed; top:16px; left:50%; transform:translateX(-50%);
+      z-index:999; max-width:90%; background:rgba(0,0,0,.75); color:#fff;
+      padding:8px 14px; border-radius:12px; font-size:13px; text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <div id="estado-ar">Cargando cámara...</div>
+
+  <a-scene id="escena-ar"
+           mindar-image="imageTargetSrc: ./targets.mind; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 5"
+           color-space="sRGB"
+           vr-mode-ui="enabled: false"
+           device-orientation-permission-ui="enabled: false">
+
+    <a-assets>
+      <a-asset-item id="termo" src="./termo.glb"></a-asset-item>
+      <img id="mensaje" src="./mensaje.png">
+    </a-assets>
+
+    <a-light type="ambient" intensity="1.2"></a-light>
+    <a-light type="directional" position="1 2 2" intensity="0.8"></a-light>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity id="objetivo-pin" mindar-image-target="targetIndex: 0">
+
+      <!-- Termo girando solito -->
+      <a-entity animation="property: rotation; to: 0 0 360; dur: 10000; easing: linear; loop: true">
+        <a-gltf-model src="#termo" rotation="90 0 0" position="0 0 0.4" scale="0.8 0.8 0.8"></a-gltf-model>
+      </a-entity>
+
+      <!-- Mensaje y número -->
+      <a-plane src="#mensaje" width="1" height="0.4" position="0 -0.55 0.01"
+               material="transparent: true; shader: flat"></a-plane>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const estado = document.getElementById('estado-ar');
+    const escena = document.getElementById('escena-ar');
+    const objetivo = document.getElementById('objetivo-pin');
+
+    escena.addEventListener('arReady', () => {
+      estado.textContent = 'Cámara lista. Enfoca tu tarjeta.';
+    });
+    escena.addEventListener('arError', (e) => {
+      estado.textContent = 'Error al iniciar la cámara. Revisa permisos o targets.mind.';
+      console.log('arError', e);
+    });
+    objetivo.addEventListener('targetFound', () => {
+      estado.textContent = 'Tarjeta detectada.';
+    });
+    objetivo.addEventListener('targetLost', () => {
+      estado.textContent = 'Enfoca tu tarjeta nuevamente.';
+    });
+  </script>
+</body>
+</html>
