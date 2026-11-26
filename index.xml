@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Recuerdo con Video</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
@@ -30,8 +31,8 @@
            device-orientation-permission-ui="enabled: false">
 
     <a-assets>
-      <video id="miVideo" src="./video.mp4" preload="auto" loop
-             playsinline webkit-playsinline crossorigin="anonymous"></video>
+      <video id="miVideo" src="./video.mp4" preload="auto" loop="true"
+             playsinline="true" webkit-playsinline="true" crossorigin="anonymous"></video>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -78,9 +79,9 @@
     btn.addEventListener('click', async () => {
       try {
         vid.muted = false;
-        await vid.play();      // desbloquea audio con el toque
+        await vid.play();
         desbloqueado = true;
-        if (!pinVisible) {     // si aún no ves el pin, espera a detectarlo
+        if (!pinVisible) {
           vid.pause();
           vid.currentTime = 0;
         }
