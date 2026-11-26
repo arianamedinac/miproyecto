@@ -20,14 +20,15 @@
   </style>
 </head>
 <body>
-  <div id="estado-ar">Cargando cámara…</div>
-  <button id="boton-play">Toca aquí para activar audio y video</button>
+  <div id="estado-ar">Cargando cámara...</div>
+  <button id="boton-play">Toca aquí para activar camara</button>
 
   <a-scene id="escena-ar"
            mindar-image="imageTargetSrc: ./targets.mind; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 5"
            color-space="sRGB"
            vr-mode-ui="enabled: false"
            device-orientation-permission-ui="enabled: false">
+
     <a-assets>
       <video id="miVideo" src="./video.mp4" preload="auto" loop
              playsinline webkit-playsinline crossorigin="anonymous"></video>
@@ -36,7 +37,7 @@
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity id="objetivo-pin" mindar-image-target="targetIndex: 0">
-      <a-plane id="plano" src="#miVideo" width="1" height="0.5625"
+      <a-plane src="#miVideo" width="1" height="1" position="0 0 0"
                material="shader: flat"></a-plane>
     </a-entity>
   </a-scene>
@@ -47,14 +48,9 @@
     const estado = document.getElementById('estado-ar');
     const escena = document.getElementById('escena-ar');
     const objetivo = document.getElementById('objetivo-pin');
-    const plano = document.getElementById('plano');
 
     let desbloqueado = false;
-
-    // Ajusta la proporción del plano al video real
-    vid.addEventListener('loadedmetadata', () => {
-      plano.setAttribute('height', vid.videoHeight / vid.videoWidth);
-    });
+    let pinVisible = false;
 
     vid.addEventListener('error', () => {
       estado.textContent = 'No cargó video.mp4. Revisa nombre y formato (H.264/AAC).';
@@ -63,15 +59,18 @@
     escena.addEventListener('arReady', () => {
       estado.textContent = 'Cámara lista. Enfoca tu pin.';
     });
-    escena.addEventListener('arError', () => {
+    escena.addEventListener('arError', (e) => {
       estado.textContent = 'Error al iniciar la cámara. Revisa permisos o targets.mind.';
+      console.log('arError', e);
     });
 
     objetivo.addEventListener('targetFound', () => {
+      pinVisible = true;
       estado.textContent = 'Pin detectado.';
       if (desbloqueado) vid.play().catch(() => {});
     });
     objetivo.addEventListener('targetLost', () => {
+      pinVisible = false;
       estado.textContent = 'Enfoca tu pin nuevamente.';
       vid.pause();
     });
@@ -79,12 +78,14 @@
     btn.addEventListener('click', async () => {
       try {
         vid.muted = false;
-        await vid.play();   // desbloquea audio/video con el gesto del usuario
-        vid.pause();        // se reanuda al detectar el pin
-        vid.currentTime = 0;
+        await vid.play();      // desbloquea audio con el toque
         desbloqueado = true;
+        if (!pinVisible) {     // si aún no ves el pin, espera a detectarlo
+          vid.pause();
+          vid.currentTime = 0;
+        }
         btn.style.display = 'none';
-        estado.textContent = 'Listo. Enfoca tu pin.';
+        estado.textContent = pinVisible ? 'Pin detectado.' : 'Listo. Enfoca tu pin.';
       } catch (err) {
         estado.textContent = 'El navegador bloqueó el audio/video o falta el archivo.';
       }
