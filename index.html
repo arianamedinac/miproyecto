@@ -21,7 +21,7 @@
 </head>
 <body>
   <div id="estado-ar">Cargando cámara…</div>
-  <button id="boton-play">Toca aquí para activar audio y video</button>
+  <button id="boton-play">Toca aquí para activar camara </button>
 
   <a-scene id="escena-ar"
            mindar-image="imageTargetSrc: ./targets.mind;"
@@ -84,7 +84,7 @@
         vid.currentTime = 0;
         desbloqueado = true;
         btn.style.display = 'none';
-        estado.textContent = 'Listo. Enfoca tu pin.';
+        estado.textContent = 'Listo. Enfoca tu imagen.';
       } catch (err) {
         estado.textContent = 'El navegador bloqueó el audio/video o falta el archivo.';
       }
